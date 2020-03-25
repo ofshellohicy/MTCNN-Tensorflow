@@ -4,14 +4,20 @@ import cv2
 import numpy as np
 import numpy.random as npr
 
+import init_path
+
 from prepare_data.utils import IoU
 
-anno_file = "wider_face_train.txt"
-im_dir = "../../DATA/WIDER_train/images"
-pos_save_dir = "../../DATA/12/positive"
-part_save_dir = "../../DATA/12/part"
-neg_save_dir = '../../DATA/12/negative'
-save_dir = "../../DATA/12"
+anno_file = "%s/prepare_data/wider_face_train.txt" % init_path.ROOT_DIR
+im_dir = "%s/../DATA/WIDER_train/images" % init_path.ROOT_DIR
+pos_save_dir = "%s/../DATA/12/positive" % init_path.ROOT_DIR
+
+part_save_dir = "%s/../DATA/12/part" % init_path.ROOT_DIR
+
+neg_save_dir = '%s/../DATA/12/negative' % init_path.ROOT_DIR
+
+save_dir = "%s/../DATA/12" % init_path.ROOT_DIR
+
 if not os.path.exists(save_dir):
     os.mkdir(save_dir)
 if not os.path.exists(pos_save_dir):
@@ -28,9 +34,9 @@ with open(anno_file, 'r') as f:
     annotations = f.readlines()
 num = len(annotations)
 print("%d pics in total" % num)
-p_idx = 0 # positive
-n_idx = 0 # negative
-d_idx = 0 # don't care
+p_idx = 0  # positive
+n_idx = 0  # negative
+d_idx = 0  # don't care
 idx = 0
 box_idx = 0
 for annotation in annotations:
@@ -46,7 +52,7 @@ for annotation in annotations:
     img = cv2.imread(os.path.join(im_dir, im_path + '.jpg'))
     idx += 1
     #if idx % 100 == 0:
-        #print(idx, "images done")
+    #print(idx, "images done")
 
     height, width, channel = img.shape
 
@@ -67,19 +73,18 @@ for annotation in annotations:
         Iou = IoU(crop_box, boxes)
 
         #crop a part from inital image
-        cropped_im = img[ny : ny + size, nx : nx + size, :]
+        cropped_im = img[ny:ny + size, nx:nx + size, :]
         #resize the cropped image to size 12*12
-        resized_im = cv2.resize(cropped_im, (12, 12), interpolation=cv2.INTER_LINEAR)
-
+        resized_im = cv2.resize(cropped_im, (12, 12),
+                                interpolation=cv2.INTER_LINEAR)
 
         if np.max(Iou) < 0.3:
             # Iou with all gts must below 0.3
-            save_file = os.path.join(neg_save_dir, "%s.jpg"%n_idx)
-            f2.write("../../DATA/12/negative/%s.jpg"%n_idx + ' 0\n')
+            save_file = os.path.join(neg_save_dir, "%s.jpg" % n_idx)
+            f2.write("../../DATA/12/negative/%s.jpg" % n_idx + ' 0\n')
             cv2.imwrite(save_file, resized_im)
             n_idx += 1
             neg_num += 1
-
 
     #for every bounding boxes
     for box in boxes:
@@ -89,7 +94,6 @@ for annotation in annotations:
         w = x2 - x1 + 1
         #gt's height
         h = y2 - y1 + 1
-
 
         # ignore small faces and those faces has left-top corner out of the image
         # in case the ground truth boxes of small faces are not accurate
@@ -113,11 +117,12 @@ for annotation in annotations:
                 continue
             crop_box = np.array([nx1, ny1, nx1 + size, ny1 + size])
             Iou = IoU(crop_box, boxes)
-    
-            cropped_im = img[ny1: ny1 + size, nx1: nx1 + size, :]
+
+            cropped_im = img[ny1:ny1 + size, nx1:nx1 + size, :]
             #rexize cropped image to be 12 * 12
-            resized_im = cv2.resize(cropped_im, (12, 12), interpolation=cv2.INTER_LINEAR)
-    
+            resized_im = cv2.resize(cropped_im, (12, 12),
+                                    interpolation=cv2.INTER_LINEAR)
+
             if np.max(Iou) < 0.3:
                 # Iou with all gts must below 0.3
                 save_file = os.path.join(neg_save_dir, "%s.jpg" % n_idx)
@@ -125,17 +130,15 @@ for annotation in annotations:
                 cv2.imwrite(save_file, resized_im)
                 n_idx += 1
 
-
         #generate positive examples and part faces
-
 
         for i in range(20):
             # pos and part face size [minsize*0.8,maxsize*1.25]
             size = npr.randint(int(min(w, h) * 0.8), np.ceil(1.25 * max(w, h)))
 
             # delta here is the offset of box center
-            if w<5:
-                print (w)
+            if w < 5:
+                print(w)
                 continue
             #print (box)
             delta_x = npr.randint(-w * 0.2, w * 0.2)
@@ -151,7 +154,7 @@ for annotation in annotations:
             ny2 = ny1 + size
 
             if nx2 > width or ny2 > height:
-                continue 
+                continue
             crop_box = np.array([nx1, ny1, nx2, ny2])
             #yu gt de offset
             offset_x1 = (x1 - nx1) / float(size)
@@ -159,26 +162,31 @@ for annotation in annotations:
             offset_x2 = (x2 - nx2) / float(size)
             offset_y2 = (y2 - ny2) / float(size)
             #crop
-            cropped_im = img[ny1 : ny2, nx1 : nx2, :]
+            cropped_im = img[ny1:ny2, nx1:nx2, :]
             #resize
-            resized_im = cv2.resize(cropped_im, (12, 12), interpolation=cv2.INTER_LINEAR)
-
+            resized_im = cv2.resize(cropped_im, (12, 12),
+                                    interpolation=cv2.INTER_LINEAR)
 
             box_ = box.reshape(1, -1)
             iou = IoU(crop_box, box_)
-            if iou  >= 0.65:
-                save_file = os.path.join(pos_save_dir, "%s.jpg"%p_idx)
-                f1.write("../../DATA/12/positive/%s.jpg"%p_idx + ' 1 %.2f %.2f %.2f %.2f\n'%(offset_x1, offset_y1, offset_x2, offset_y2))
+            if iou >= 0.65:
+                save_file = os.path.join(pos_save_dir, "%s.jpg" % p_idx)
+                f1.write("../../DATA/12/positive/%s.jpg" % p_idx +
+                         ' 1 %.2f %.2f %.2f %.2f\n' %
+                         (offset_x1, offset_y1, offset_x2, offset_y2))
                 cv2.imwrite(save_file, resized_im)
                 p_idx += 1
             elif iou >= 0.4:
-                save_file = os.path.join(part_save_dir, "%s.jpg"%d_idx)
-                f3.write("../../DATA/12/part/%s.jpg"%d_idx + ' -1 %.2f %.2f %.2f %.2f\n'%(offset_x1, offset_y1, offset_x2, offset_y2))
+                save_file = os.path.join(part_save_dir, "%s.jpg" % d_idx)
+                f3.write("../../DATA/12/part/%s.jpg" % d_idx +
+                         ' -1 %.2f %.2f %.2f %.2f\n' %
+                         (offset_x1, offset_y1, offset_x2, offset_y2))
                 cv2.imwrite(save_file, resized_im)
                 d_idx += 1
         box_idx += 1
         if idx % 100 == 0:
-            print("%s images done, pos: %s part: %s neg: %s" % (idx, p_idx, d_idx, n_idx))
+            print("%s images done, pos: %s part: %s neg: %s" %
+                  (idx, p_idx, d_idx, n_idx))
 f1.close()
 f2.close()
 f3.close()
