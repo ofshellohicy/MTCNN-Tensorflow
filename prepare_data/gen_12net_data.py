@@ -1,4 +1,5 @@
 #coding:utf-8
+
 import os
 import cv2
 import numpy as np
@@ -7,6 +8,8 @@ import numpy.random as npr
 import init_path
 
 from prepare_data.utils import IoU
+
+print '生成PNet 数据'
 
 anno_file = "%s/prepare_data/wider_face_train.txt" % init_path.ROOT_DIR
 im_dir = "%s/../DATA/WIDER_train/images" % init_path.ROOT_DIR

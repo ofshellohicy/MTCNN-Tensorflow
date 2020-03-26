@@ -109,14 +109,14 @@ class ImageCoder(object):
         self._sess = tf.Session()
 
         # Initializes function that converts PNG to JPEG data.
-        self._png_data = tf.placeholder(dtype=tf.string)
+        self._png_data = tf.compat.v1.placeholder(dtype=tf.string)
         image = tf.image.decode_png(self._png_data, channels=3)
         self._png_to_jpeg = tf.image.encode_jpeg(image,
                                                  format='rgb',
                                                  quality=100)
 
         # Initializes function that decodes RGB JPEG data.
-        self._decode_jpeg_data = tf.placeholder(dtype=tf.string)
+        self._decode_jpeg_data = tf.compat.v1.placeholder(dtype=tf.string)
         self._decode_jpeg = tf.image.decode_jpeg(self._decode_jpeg_data,
                                                  channels=3)
 

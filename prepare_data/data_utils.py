@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 """
 @version: 1.0
 @author: liuhengli
@@ -51,12 +50,11 @@ def read_annotation(base_dir, label_path):
             one_image_bboxes.append([xmin, ymin, xmax, ymax])
             # f.write(text + '\n')
         bboxes.append(one_image_bboxes)
-
-
-    data['images'] = images#all images
-    data['bboxes'] = bboxes#all image bboxes
+    data['images'] = images  # all images
+    data['bboxes'] = bboxes  # all image bboxes
     # f.close()
     return data
+
 
 def read_and_write_annotation(base_dir, dir):
     """
@@ -87,7 +85,8 @@ def read_and_write_annotation(base_dir, dir):
             bb_info = labelfile.readline().strip('\n').split(' ')
             # only need x, y, w, h
             face_box = [float(bb_info[i]) for i in range(4)]
-            text = text + ' ' + str(face_box[0] / w) + ' ' + str(face_box[1] / h)
+            text = text + ' ' + str(face_box[0] / w) + ' ' + str(
+                face_box[1] / h)
             xmin = face_box[0]
             ymin = face_box[1]
             xmax = xmin + face_box[2] - 1
@@ -97,14 +96,15 @@ def read_and_write_annotation(base_dir, dir):
             f.write(text + '\n')
         bboxes.append(one_image_bboxes)
 
-
     data['images'] = images
     data['bboxes'] = bboxes
     f.close()
     return data
 
+
 def get_path(base_dir, filename):
     return os.path.join(base_dir, filename)
+
 
 def IoU(box, bboxes):
     """
@@ -115,7 +115,8 @@ def IoU(box, bboxes):
     numpy array, shape (n, ) Iou
     """
     box_area = (box[2] - box[0] + 1) * (box[3] - box[1] + 1)
-    areas = (bboxes[:, 2] - bboxes[:, 0] + 1) * (bboxes[:, 3] - bboxes[:, 1] + 1)
+    areas = (bboxes[:, 2] - bboxes[:, 0] + 1) * (bboxes[:, 3] - bboxes[:, 1] +
+                                                 1)
     xx1 = np.maximum(box[0], bboxes[:, 0])
     yy1 = np.maximum(box[1], bboxes[:, 1])
     xx2 = np.minimum(box[2], bboxes[:, 2])
@@ -131,8 +132,6 @@ def IoU(box, bboxes):
     return over
 
 
-
-
 if __name__ == '__main__':
     dir = '/media/thinkjoy/新加卷/dataset/widerface/wider_face_split/wider_face_train_bbx_gt.txt'
     base_dir = '/media/thinkjoy/新加卷/dataset/widerface'
@@ -142,8 +141,3 @@ if __name__ == '__main__':
     print("============")
     print('\n')
     print(data['bboxes'])
-
-
-
-
-

@@ -55,15 +55,15 @@ def random_flip_images(image_batch,label_batch,landmark_batch):
     indexes = np.where(random_number>0)[0]
     fliplandmarkindexes = np.where(label_batch[indexes]==-2)[0]
 
-    #random flip    
+    #random flip
     for i in indexes:
         cv2.flip(image_batch[i],1,image_batch[i])
-    #pay attention: flip landmark    
+    #pay attention: flip landmark
     for i in fliplandmarkindexes:
         landmark_ = landmark_batch[i].reshape((-1,2))
         landmark_ = np.asarray([(1-x, y) for (x, y) in landmark_])
         landmark_[[0, 1]] = landmark_[[1, 0]]#left eye<->right eye
-        landmark_[[3, 4]] = landmark_[[4, 3]]#left mouth<->right mouth        
+        landmark_[[3, 4]] = landmark_[[4, 3]]#left mouth<->right mouth
         landmark_batch[i] = landmark_.ravel()
     return image_batch,landmark_batch
 '''
@@ -73,7 +73,7 @@ def random_flip_images(image_batch,label_batch,landmark_batch):
 def random_flip_images(image_batch, label_batch, landmark_batch):
     # mirror
     if random.choice([0, 1]) > 0:
-        num_images = image_batch.shape[0]
+        # num_images = image_batch.shape[0]
         fliplandmarkindexes = np.where(label_batch == -2)[0]
         flipposindexes = np.where(label_batch == 1)[0]
         # only flip
@@ -180,15 +180,17 @@ def train(net_factory, prefix, end_epoch, base_dir, display=200, base_lr=0.01):
         radio_landmark_loss = 1
         image_size = 48
 
-    # define placeholder
-    input_image = tf.placeholder(
+    # define compat.v1.placeholder
+    input_image = tf.compat.v1.placeholder(
         tf.float32,
         shape=[config.BATCH_SIZE, image_size, image_size, 3],
         name='input_image')
-    label = tf.placeholder(tf.float32, shape=[config.BATCH_SIZE], name='label')
-    bbox_target = tf.placeholder(tf.float32,
-                                 shape=[config.BATCH_SIZE, 4],
-                                 name='bbox_target')
+    label = tf.compat.v1.placeholder(tf.float32,
+                                     shape=[config.BATCH_SIZE],
+                                     name='label')
+    bbox_target = tf.compat.v1.placeholder(tf.float32,
+                                           shape=[config.BATCH_SIZE, 4],
+                                           name='bbox_target')
     landmark_target = tf.placeholder(tf.float32,
                                      shape=[config.BATCH_SIZE, 10],
                                      name='landmark_target')
