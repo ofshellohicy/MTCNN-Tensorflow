@@ -4,6 +4,8 @@ import random
 import sys
 import time
 
+import init_path
+
 import tensorflow as tf
 
 from prepare_data.tfrecord_utils import _process_image_withoutcoder, _convert_to_example_simple
@@ -31,7 +33,7 @@ def _get_output_filename(output_dir, name, net):
     #st = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     #return '%s/%s_%s_%s.tfrecord' % (output_dir, name, net, st)
     return '%s/train_PNet_landmark.tfrecord' % (output_dir)
-    
+
 
 def run(dataset_dir, net, output_dir, name='MTCNN', shuffling=False):
     """Runs the conversion operation.
@@ -40,8 +42,8 @@ def run(dataset_dir, net, output_dir, name='MTCNN', shuffling=False):
       dataset_dir: The dataset directory where the dataset is stored.
       output_dir: Output directory.
     """
-    
-    #tfrecord name 
+
+    #tfrecord name
     tf_filename = _get_output_filename(output_dir, name, net)
     if tf.gfile.Exists(tf_filename):
         print('Dataset files already exist. Exiting without re-creating them.')
@@ -58,8 +60,9 @@ def run(dataset_dir, net, output_dir, name='MTCNN', shuffling=False):
     print('lala')
     with tf.python_io.TFRecordWriter(tf_filename) as tfrecord_writer:
         for i, image_example in enumerate(dataset):
-            if (i+1) % 100 == 0:
-                sys.stdout.write('\r>> %d/%d images has been converted' % (i+1, len(dataset)))
+            if (i + 1) % 100 == 0:
+                sys.stdout.write('\r>> %d/%d images has been converted' %
+                                 (i + 1, len(dataset)))
                 #sys.stdout.write('\r>> Converting image %d/%d' % (i + 1, len(dataset)))
             sys.stdout.flush()
             filename = image_example['filename']
@@ -74,7 +77,7 @@ def get_dataset(dir, net='PNet'):
     #get file name , label and anotation
     #item = 'imglists/PNet/train_%s_raw.txt' % net
     item = 'imglists/PNet/train_%s_landmark.txt' % net
-    
+
     dataset_dir = os.path.join(dir, item)
     #print(dataset_dir)
     imagelist = open(dataset_dir, 'r')
@@ -100,7 +103,7 @@ def get_dataset(dir, net='PNet'):
         bbox['xleftmouth'] = 0
         bbox['yleftmouth'] = 0
         bbox['xrightmouth'] = 0
-        bbox['yrightmouth'] = 0        
+        bbox['yrightmouth'] = 0
         if len(info) == 6:
             bbox['xmin'] = float(info[2])
             bbox['ymin'] = float(info[3])
@@ -117,7 +120,7 @@ def get_dataset(dir, net='PNet'):
             bbox['yleftmouth'] = float(info[9])
             bbox['xrightmouth'] = float(info[10])
             bbox['yrightmouth'] = float(info[11])
-            
+
         data_example['bbox'] = bbox
         dataset.append(data_example)
 
@@ -125,7 +128,7 @@ def get_dataset(dir, net='PNet'):
 
 
 if __name__ == '__main__':
-    dir = '../../DATA/'
+    dir = '%s/../DATA/' % init_path.ROOT_DIR
     net = 'PNet'
-    output_directory = '../../DATA/imglists/PNet'
+    output_directory = '%s/../DATA/imglists/PNet' % init_path.ROOT_DIR
     run(dir, net, output_directory, shuffling=True)

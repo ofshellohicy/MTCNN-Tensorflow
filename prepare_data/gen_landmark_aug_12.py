@@ -50,7 +50,15 @@ def GenerateData(ftxt, data_path, net, argument=False):
         img = cv2.imread(imgPath)
 
         if img is None:
-            print imgPath
+            # 兼容不同格式的数据集
+            base_name = os.path.basename(imgPath)
+            bs = base_name.split('_')
+            img_dir = '_'.join(bs[:-1])
+            imgPath = imgPath.replace(base_name,
+                                      '%s/%s' % (img_dir, base_name))
+            img = cv2.imread(imgPath)
+            if img is None:
+                print imgPath
 
         assert (img is not None)
         img_h, img_w, img_c = img.shape

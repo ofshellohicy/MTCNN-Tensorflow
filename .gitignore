@@ -1,2 +1,3 @@
 *.pyc
 .vscode
+data/MTCNN_model/PNet_landmark/*
