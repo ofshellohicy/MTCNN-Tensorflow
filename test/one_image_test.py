@@ -16,8 +16,18 @@ stride = 2
 slide_window = False
 shuffle = False
 detectors = [None, None, None]
-prefix = ['../data/MTCNN_model/PNet_No_landmark/PNet', '../data/MTCNN_model/RNet_landmark/RNet', '../data/MTCNN_model/ONet_landmark/ONet']
+prefix = [
+    # '../data/MTCNN_model/PNet_No_landmark/PNet',
+    # '../data/MTCNN_model/RNet_landmark/RNet',
+    # '../data/MTCNN_model/ONet_landmark/ONet'
+    '../data/MTCNN_model/PNet_landmark/PNet',
+    '../data/MTCNN_model/RNet_landmark/RNet',
+    '../data/MTCNN_model/ONet_landmark/ONet'
+]
 epoch = [30, 14, 16]
+
+test_mode = 'ONet'
+
 batch_size = [2048, 64, 16]
 model_path = ['%s-%s' % (x, y) for x, y in zip(prefix, epoch)]
 # load pnet model
@@ -37,8 +47,11 @@ if test_mode == "ONet":
     ONet = Detector(O_Net, 48, batch_size[2], model_path[2])
     detectors[2] = ONet
 
-mtcnn_detector = MtcnnDetector(detectors=detectors, min_face_size=min_face_size,
-                               stride=stride, threshold=thresh, slide_window=slide_window)
+mtcnn_detector = MtcnnDetector(detectors=detectors,
+                               min_face_size=min_face_size,
+                               stride=stride,
+                               threshold=thresh,
+                               slide_window=slide_window)
 gt_imdb = []
 #gt_imdb.append("35_Basketball_Basketball_35_515.jpg")
 #imdb_ = dict()"
@@ -46,20 +59,22 @@ gt_imdb = []
 #imdb_['label'] = 5
 path = "../../DATA/test/lfpw_testImage"
 for item in os.listdir(path):
-    gt_imdb.append(os.path.join(path,item))
+    gt_imdb.append(os.path.join(path, item))
 test_data = TestLoader(gt_imdb)
-
-
-all_boxes,landmarks = mtcnn_detector.detect_face(test_data)
+all_boxes, landmarks = mtcnn_detector.detect_face(test_data)
 
 count = 0
 for imagepath in gt_imdb:
     print(imagepath)
     image = cv2.imread(imagepath)
     for bbox in all_boxes[count]:
-        cv2.putText(image,str(np.round(bbox[4],2)),(int(bbox[0]),int(bbox[1])),cv2.FONT_HERSHEY_TRIPLEX,1,color=(255,0,255))
-        cv2.rectangle(image, (int(bbox[0]),int(bbox[1])),(int(bbox[2]),int(bbox[3])),(0,0,255))
-
+        cv2.putText(image,
+                    str(np.round(bbox[4], 2)), (int(bbox[0]), int(bbox[1])),
+                    cv2.FONT_HERSHEY_TRIPLEX,
+                    1,
+                    color=(255, 0, 255))
+        cv2.rectangle(image, (int(bbox[0]), int(bbox[1])),
+                      (int(bbox[2]), int(bbox[3])), (0, 0, 255))
     '''
         for landmark in landmarks[count]:
 
@@ -67,16 +82,10 @@ for imagepath in gt_imdb:
             cv2.circle(image, (int(landmark[2*i]),int(int(landmark[2*i+1]))), 3, (0,0,255))
     '''
 
-        
     count = count + 1
     #cv2.imwrite("result_landmark/%d.png" %(count),image)
-    cv2.imshow("lala",image)
-    cv2.waitKey(0)    
-
-
-
-
-
+    cv2.imshow("lala", image)
+    cv2.waitKey(0)
 '''
 for data in test_data:
     print type(data)
