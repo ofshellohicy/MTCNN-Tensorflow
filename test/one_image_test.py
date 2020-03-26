@@ -58,9 +58,20 @@ gt_imdb = []
 #imdb_['image'] = im_path
 #imdb_['label'] = 5
 path = "../../DATA/test/lfpw_testImage"
+
+test_count = 0
+test_num = 1000
 for item in os.listdir(path):
-    gt_imdb.append(os.path.join(path, item))
+    test_count += 1
+    if test_count > test_num:
+        continue
+    else:
+        gt_imdb.append(os.path.join(path, item))
+
+print 'test num: %s/%s' % (test_num, test_count)
+
 test_data = TestLoader(gt_imdb)
+
 all_boxes, landmarks = mtcnn_detector.detect_face(test_data)
 
 count = 0
@@ -75,12 +86,13 @@ for imagepath in gt_imdb:
                     color=(255, 0, 255))
         cv2.rectangle(image, (int(bbox[0]), int(bbox[1])),
                       (int(bbox[2]), int(bbox[3])), (0, 0, 255))
-    '''
-        for landmark in landmarks[count]:
 
-        for i in range(len(landmark)//2):
-            cv2.circle(image, (int(landmark[2*i]),int(int(landmark[2*i+1]))), 3, (0,0,255))
-    '''
+    # 绘制landmark
+    for landmark in landmarks[count]:
+        for i in range(len(landmark) // 2):
+            cv2.circle(image,
+                       (int(landmark[2 * i]), int(int(landmark[2 * i + 1]))),
+                       3, (255, 255, 0))
 
     count = count + 1
     #cv2.imwrite("result_landmark/%d.png" %(count),image)
