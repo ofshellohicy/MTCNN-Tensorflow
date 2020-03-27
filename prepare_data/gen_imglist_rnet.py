@@ -15,25 +15,26 @@ elif size == 24:
     net = "RNet"
 elif size == 48:
     net = "ONet"
-
-
-with open(os.path.join(data_dir, '%s/pos_%s.txt' % (dir_name, size)), 'r') as f:
+with open(os.path.join(data_dir, '%s/pos_%s.txt' % (dir_name, size)),
+          'r') as f:
     pos = f.readlines()
 
-with open(os.path.join(data_dir, '%s/neg_%s.txt' % (dir_name, size)), 'r') as f:
+with open(os.path.join(data_dir, '%s/neg_%s.txt' % (dir_name, size)),
+          'r') as f:
     neg = f.readlines()
 
-with open(os.path.join(data_dir, '%s/part_%s.txt' % (dir_name, size)), 'r') as f:
+with open(os.path.join(data_dir, '%s/part_%s.txt' % (dir_name, size)),
+          'r') as f:
     part = f.readlines()
-
 
 #with open(os.path.join(data_dir, '%s/landmark_%s_aug.txt' % (size, size)), 'r') as f:
 #    landmark = f.readlines()
-with open(os.path.join(data_dir, '%s/landmark_%s_aug.txt' % (size, size)), 'r') as f:
+with open(os.path.join(data_dir, '%s/landmark_%s_aug.txt' % (size, size)),
+          'r') as f:
     landmark = f.readlines()
-  
+
 #dir_path = os.path.join(data_dir, 'imglists',"RNet")
-dir_path = os.path.join(data_dir, 'imglists_noLM',"RNet")
+dir_path = os.path.join(data_dir, 'imglists_noLM', "RNet")
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 #write all data
